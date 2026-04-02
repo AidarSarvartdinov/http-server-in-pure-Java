@@ -1,6 +1,8 @@
 package com.server.http.server.request;
 
+import com.server.http.server.common.HttpHeaders;
 import com.server.http.server.common.HttpMethod;
+import com.server.http.server.exception.RequestContextException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,10 +18,15 @@ public class RequestContext {
 
     private final List<String> pathParts;
 
-    public RequestContext(HttpMethod method, String path) {
+    private final HttpHeaders headers;
+
+    private String body;
+
+    public RequestContext(HttpMethod method, String path, HttpHeaders headers) {
         this.path = path;
         this.method = method;
         this.pathParts = Arrays.stream(path.split("/")).toList();
+        this.headers = headers;
     }
 
     public static RequestContext buildContext(BufferedReader reader) {
@@ -35,13 +42,24 @@ public class RequestContext {
             while ((line = reader.readLine()) != null && !line.isEmpty()) {
                 headers.add(line);
             }
+
+            HttpHeaders httpHeaders = HttpHeaders.fromHeaderList(headers);
             System.out.println("HTTP request headers: " + headers);
-            var requestContext = new RequestContext(methodWithPath.getKey(), methodWithPath.getValue());
+            var requestContext = new RequestContext(methodWithPath.getKey(), methodWithPath.getValue(), httpHeaders);
+
+            var contentLength = httpHeaders.getFirst("Content-Length");
+            if (contentLength != null && !contentLength.isBlank()) {
+                int bodySize = Integer.parseInt(contentLength);
+                char[] bodyBuffer = new char[bodySize];
+                reader.read(bodyBuffer);
+                requestContext.setBody(new String(bodyBuffer));
+            }
+
             return requestContext;
 
         } catch (IOException e) {
             System.out.println("Exception trying to build request context");
-            throw new RuntimeException(e);
+            throw new RequestContextException(e);
         }
     }
 
@@ -60,6 +78,14 @@ public class RequestContext {
         }
 
         return  pathParts.get(index);
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getBody() {
+        return body;
     }
 
     public boolean pathsIsEqualsTo(String actualPath) {
