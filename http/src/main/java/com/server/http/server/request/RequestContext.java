@@ -80,6 +80,14 @@ public class RequestContext {
         return  pathParts.get(index);
     }
 
+    public String getLastPart() {
+        return getPart(pathParts.size() - 1);
+    }
+
+    public HttpHeaders getHeaders() {
+        return this.headers;
+    }
+
     public void setBody(String body) {
         this.body = body;
     }
