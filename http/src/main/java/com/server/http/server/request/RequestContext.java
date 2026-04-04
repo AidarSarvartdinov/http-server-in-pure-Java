@@ -96,6 +96,14 @@ public class RequestContext {
         return body;
     }
 
+    public HttpMethod getMethod()  {
+        return method;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
     public boolean pathsIsEqualsTo(String actualPath) {
         return hasPath() && path.equals(actualPath);
     }
