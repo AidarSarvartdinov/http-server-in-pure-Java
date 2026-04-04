@@ -18,7 +18,6 @@ public class HandlerHolder {
 
     private HandlerHolder() {
         handlerTypeList.add(ApplicationController.class);
-
     }
 
     public static HandlerHolder getInstance() {
