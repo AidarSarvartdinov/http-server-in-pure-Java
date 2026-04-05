@@ -2,6 +2,7 @@ package com.server.http.server.handler;
 
 import com.server.http.server.bind.HandlerMethod;
 import com.server.http.server.common.HttpStatus;
+import com.server.http.server.interceptor.InterceptorHolder;
 import com.server.http.server.request.RequestContext;
 import com.server.http.server.response.ResponseContext;
 import com.server.http.server.service.HandlerMethodResolver;
@@ -42,6 +43,7 @@ public class RequestHandler implements Runnable {
                     outputStream.write(ResponseContext.build(responseContext.getStatus()).getResponseAsBytes());
                     outputStream.flush();
                 } else {
+                    InterceptorHolder.getInstance().beforeSendResponse(context, responseContext);
                     outputStream.write(responseContext.getResponseAsBytes());
                     outputStream.flush();
                 }

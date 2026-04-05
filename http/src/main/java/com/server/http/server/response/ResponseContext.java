@@ -59,11 +59,15 @@ public class ResponseContext {
         }
     }
 
-    private void setResponseBody(byte[] responseBody) {
+    public void setResponseBody(byte[] responseBody) {
         this.responseBody = responseBody;
     }
 
-    private void setHeaders(HttpHeaders headers) {
+    public HttpHeaders getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(HttpHeaders headers) {
         this.headers = headers;
     }
 
@@ -74,4 +78,9 @@ public class ResponseContext {
     public void setStatus(HttpStatus status) {
         this.status = Objects.requireNonNull(status);
     }
+
+    public byte[] getResponseBody() {
+        return responseBody;
+    }
+
 }
