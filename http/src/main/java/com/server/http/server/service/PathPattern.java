@@ -44,10 +44,9 @@ public class PathPattern {
                 if (segmentIndex != segments.length - 1) {
                     return false;
                 }
-            } else {
-                if (segmentIndex == segments.length - 1) {
-                    return false;
-                }
+
+            } else if (segmentIndex == segments.length - 1) {
+                return false;
             }
 
             Segment segment = segments[segmentIndex];
@@ -58,6 +57,7 @@ public class PathPattern {
 
             input = input.substring(j);
         }
+        
         return true;
     }
 

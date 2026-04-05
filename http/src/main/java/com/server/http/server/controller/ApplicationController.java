@@ -10,6 +10,7 @@ import com.server.http.server.request.RequestContext;
 import com.server.http.server.response.ResponseContext;
 
 public class ApplicationController {
+    
     @RequestMapping(path = "/", method = HttpMethod.GET)
     public ResponseContext simpleOk(RequestContext requestContext) {
         return ResponseContext.build(HttpStatus.OK);

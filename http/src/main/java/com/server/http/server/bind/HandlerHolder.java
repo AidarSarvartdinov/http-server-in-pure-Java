@@ -18,6 +18,7 @@ public class HandlerHolder {
 
     private HandlerHolder() {
         handlerTypeList.add(ApplicationController.class);
+        collectHandlerMethods();
     }
 
     public static HandlerHolder getInstance() {
