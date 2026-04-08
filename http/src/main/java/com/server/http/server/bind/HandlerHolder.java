@@ -1,11 +1,12 @@
 package com.server.http.server.bind;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.server.http.server.controller.ApplicationController;
+import com.server.http.Main;
 import com.server.http.server.request.RequestContext;
 import com.server.http.server.response.ResponseContext;
 
@@ -16,8 +17,14 @@ public class HandlerHolder {
 
     private final List<HandlerMethod> handlerMethods = new ArrayList<>();
 
+    private final ClassScanner classScanner = new ClassScanner(Main.class.getClassLoader());
+
     private HandlerHolder() {
-        handlerTypeList.add(ApplicationController.class);
+        try {
+            handlerTypeList.addAll(classScanner.findClassesAnnotatedWith(Controller.class));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         collectHandlerMethods();
     }
 
@@ -47,9 +54,12 @@ public class HandlerHolder {
                         if (method.getReturnType() == ResponseContext.class) {
                             var annotation = method.getAnnotation(RequestMapping.class);
                             try {
-                                handlerMethods.add(new HandlerMethod(handlerType.getConstructor().newInstance(), annotation.method(), annotation.path(), method));
-                            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                                System.out.println("Exception trying to create object for class: " + handlerType.getName());
+                                handlerMethods.add(new HandlerMethod(handlerType.getConstructor().newInstance(),
+                                        annotation.method(), annotation.path(), method));
+                            } catch (InstantiationException | IllegalAccessException | InvocationTargetException
+                                    | NoSuchMethodException e) {
+                                System.out.println(
+                                        "Exception trying to create object for class: " + handlerType.getName());
                             }
                         }
                     }
