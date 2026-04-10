@@ -9,10 +9,13 @@ import com.server.http.server.service.HandlerMethodResolver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class RequestHandler implements Runnable {
     private final Socket clientSocket;
     private final HandlerMethodResolver handlerMethodResolver;
+    private static final Logger log = Logger.getLogger(RequestHandler.class.getName());
 
     public RequestHandler(Socket clientSocket) {
         this.clientSocket = clientSocket;
@@ -27,10 +30,13 @@ public class RequestHandler implements Runnable {
             RequestContext context = RequestContext.buildContext(reader);
 
             if (context == null) {
-                System.out.println("Context is null");
+                log.warning("Context is null");
+                clientSocket.close();
                 return;
             }
 
+            log.log(Level.INFO, "Received request {0} {1}",
+                    new Object[] { context.getMethod().toString(), context.getPath() });
             OutputStream outputStream = clientSocket.getOutputStream();
             HandlerMethod handlerMethod = handlerMethodResolver.resolve(context);
 
@@ -50,13 +56,18 @@ public class RequestHandler implements Runnable {
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("Handler exception: " + e);
+            // throw new RuntimeException("Handler exception: " + e);
+            log.log(Level.WARNING, "IO error processing request", e);
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "Unexpected error in request handler", e);
         } finally {
             try {
                 clientSocket.close();
-                System.out.println("Socket closed");
+                // System.out.println("Socket closed");
+                log.log(Level.FINE, "Socket closed for {0}", clientSocket.getRemoteSocketAddress());
             } catch (IOException e) {
-                System.out.println("Exception trying to close socket");
+                // System.out.println("Exception trying to close socket");
+                log.log(Level.WARNING, "Exception trying to close socket", e);
             }
         }
     }

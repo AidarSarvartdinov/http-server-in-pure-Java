@@ -10,6 +10,8 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class RequestContext {
     private final HttpMethod method;
@@ -21,6 +23,8 @@ public class RequestContext {
     private final HttpHeaders headers;
 
     private String body;
+
+    private static final Logger log = Logger.getLogger(RequestContext.class.getName());
 
     public RequestContext(HttpMethod method, String path, HttpHeaders headers) {
         this.path = path;
@@ -44,7 +48,6 @@ public class RequestContext {
             }
 
             HttpHeaders httpHeaders = HttpHeaders.fromHeaderList(headers);
-            System.out.println("HTTP request headers: " + headers);
             var requestContext = new RequestContext(methodWithPath.getKey(), methodWithPath.getValue(), httpHeaders);
 
             var contentLength = httpHeaders.getFirst("Content-Length");
@@ -58,7 +61,8 @@ public class RequestContext {
             return requestContext;
 
         } catch (IOException e) {
-            System.out.println("Exception trying to build request context");
+            // System.out.println("Exception trying to build request context");
+            log.log(Level.SEVERE, "Exception trying to build request context", e);
             throw new RequestContextException(e);
         }
     }

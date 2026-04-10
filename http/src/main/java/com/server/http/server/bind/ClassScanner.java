@@ -9,9 +9,13 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ClassScanner {
     private ClassLoader classLoader;
+
+    private static final Logger log = Logger.getLogger(ClassScanner.class.getName());
 
     public ClassScanner(ClassLoader classLoader) {
         this.classLoader = classLoader;
@@ -30,7 +34,8 @@ public class ClassScanner {
                         classes.add(clazz);
                     }
                 } catch (ClassNotFoundException | NoClassDefFoundError ex) {
-                    System.err.println("Could not load class from JAR: " + className);
+                    // System.err.println("Could not load class from JAR: " + className);
+                    log.log(Level.SEVERE, "Could not load class from JAR: " + className, ex);
                 }
             }
         }
@@ -40,10 +45,7 @@ public class ClassScanner {
             throws IOException {
         List<Class<?>> classes = new ArrayList<>();
         String classPath = System.getProperty("java.class.path");
-        System.out.println("JAVA CLASS PATH: " + classPath);
         String[] paths = classPath.split(File.pathSeparator);
-        System.out.println("Scanning classpath roots...");
-
 
         for (String path : paths) {
             File file = new File(path);
@@ -57,7 +59,6 @@ public class ClassScanner {
                 }
             }
         }
-        System.out.println("Total classes found: " + classes.size());
         return classes;
     }
 
@@ -65,7 +66,8 @@ public class ClassScanner {
         File dir = path.toFile();
         File[] files = dir.listFiles();
         if (files == null) {
-            System.err.println("Cannot read directory: " + dir.getAbsolutePath());
+            // System.err.println("Cannot read directory: " + dir.getAbsolutePath());
+            log.log(Level.SEVERE, "Cannot read directory: " + dir.getAbsolutePath());
             return;
         }
         for (File file : files) {
@@ -79,7 +81,8 @@ public class ClassScanner {
                         classes.add(clazz);
                     }
                 } catch (ClassNotFoundException e) {
-                    System.err.println("Failed to load class: " + className);
+                    // System.err.println("Failed to load class: " + className);
+                    log.log(Level.SEVERE, "Failed to load class: " + className, e);
                 }
             }
         }

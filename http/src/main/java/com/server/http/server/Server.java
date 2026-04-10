@@ -7,11 +7,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Server {
     private final int port;
 
     private final ExecutorService executorService;
+
+    private static final Logger log = Logger.getLogger(Server.class.getName());
 
     public Server(int port) {
         this.port = port;
@@ -19,15 +23,18 @@ public class Server {
     }
 
     public void start() {
+        log.info("Starting server...");
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             serverSocket.setReuseAddress(true);
+            log.log(Level.INFO, "Server started on port {0}", String.valueOf(port));
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Accepted new connection");
+                // System.out.println("Accepted new connection");
                 executorService.execute(new RequestHandler(clientSocket));
             }
         } catch (IOException e) {
-            System.out.println("IOException: " + e.getMessage());
+            // System.out.println("IOException: " + e.getMessage());
+            log.log(Level.SEVERE, "IOException", e);
         }
     }
 }

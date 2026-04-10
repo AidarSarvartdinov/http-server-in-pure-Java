@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.server.http.Main;
 import com.server.http.server.request.RequestContext;
@@ -18,6 +20,8 @@ public class HandlerHolder {
     private final List<HandlerMethod> handlerMethods = new ArrayList<>();
 
     private final ClassScanner classScanner = new ClassScanner(Main.class.getClassLoader());
+
+    private static final Logger log = Logger.getLogger(HandlerHolder.class.getName());
 
     private HandlerHolder() {
         try {
@@ -58,8 +62,10 @@ public class HandlerHolder {
                                         annotation.method(), annotation.path(), method));
                             } catch (InstantiationException | IllegalAccessException | InvocationTargetException
                                     | NoSuchMethodException e) {
-                                System.out.println(
-                                        "Exception trying to create object for class: " + handlerType.getName());
+                                // System.out.println(
+                                // "Exception trying to create object for class: " + handlerType.getName());
+                                log.log(Level.SEVERE,
+                                        "Exception trying to create object for class: " + handlerType.getName(), e);
                             }
                         }
                     }
