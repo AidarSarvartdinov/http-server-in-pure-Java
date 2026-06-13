@@ -1,6 +1,5 @@
 package com.server.http.server.bind;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -23,12 +22,8 @@ public class HandlerHolder {
 
     private static final Logger log = Logger.getLogger(HandlerHolder.class.getName());
 
-    private HandlerHolder() {
-        try {
-            handlerTypeList.addAll(classScanner.findClassesAnnotatedWith(Controller.class));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private HandlerHolder() {    
+        handlerTypeList.addAll(classScanner.findClassesAnnotatedWith(Controller.class));
         collectHandlerMethods();
     }
 
@@ -62,9 +57,7 @@ public class HandlerHolder {
                                         annotation.method(), annotation.path(), method));
                             } catch (InstantiationException | IllegalAccessException | InvocationTargetException
                                     | NoSuchMethodException e) {
-                                // System.out.println(
-                                // "Exception trying to create object for class: " + handlerType.getName());
-                                log.log(Level.SEVERE,
+                                log.log(Level.WARNING,
                                         "Exception trying to create object for class: " + handlerType.getName(), e);
                             }
                         }
