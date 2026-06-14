@@ -6,6 +6,13 @@ import java.lang.reflect.Method;
 import com.server.http.server.common.HttpMethod;
 import com.server.http.server.exception.HandlerException;
 
+/**
+ * Represents a single HTTP handler method discovered from a controller class.
+ * <p>
+ * Contains the target controller instance, the HTTP method, the request path,
+ * and the {@link Method} to invoke.
+ * </p>
+ */
 public class HandlerMethod {
     private final Object handlerObject;
 

@@ -16,6 +16,13 @@ public enum HttpMethod {
         return  type;
     }
 
+    /**
+     * Converts a case-insensitive string (e.g., "GET", "Post") into the corresponding {@code HttpMethod}.
+     *
+     * @param type the HTTP method as string
+     * @return the matching enum constant
+     * @throws IllegalArgumentException if the string does not match any known method
+     */
     public static HttpMethod fromType(String type) {
         return Arrays.stream(values())
                 .filter(it -> it.type.equalsIgnoreCase(type))

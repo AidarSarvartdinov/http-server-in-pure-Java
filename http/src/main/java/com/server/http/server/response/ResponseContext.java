@@ -47,7 +47,7 @@ public class ResponseContext {
                 outputStream.write(headers.toString().getBytes());
             }
 
-            outputStream.write("\r\n".getBytes());
+            // outputStream.write("\r\n".getBytes());
 
             if (responseBody != null) {
                 outputStream.write(responseBody);
