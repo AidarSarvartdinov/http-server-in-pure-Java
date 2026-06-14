@@ -6,13 +6,21 @@ import com.server.http.server.exception.RequestContextException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Represents an HTTP request context containing method, path, headers, and body.
+ * <p>
+ * Parses a raw HTTP request from a {@link BufferedReader}. Supports reading the
+ * body based on the {@code Content-Length} header. Provides utility methods to
+ * access path segments and compare paths.
+ * </p>
+ */
 public class RequestContext {
     private final HttpMethod method;
 
@@ -29,18 +37,30 @@ public class RequestContext {
     public RequestContext(HttpMethod method, String path, HttpHeaders headers) {
         this.path = path;
         this.method = method;
-        this.pathParts = Arrays.stream(path.split("/")).toList();
+        this.pathParts = Arrays.stream(path.split("/")).filter(part -> !part.isEmpty()).toList();
         this.headers = headers;
     }
 
-    public static RequestContext buildContext(BufferedReader reader) {
+    /**
+     * Parses an HTTP request from the given reader.
+     * <p>
+     * Reads the request line, then headers until an empty line. If {@code Content-Length}
+     * is present, reads exactly that many characters into the body. Malformed request
+     * lines (missing path) cause a {@link RequestContextException}.
+     * </p>
+     *
+     * @param reader the buffered reader from the client socket
+     * @return a populated RequestContext, or {@code null} if the request line is empty
+     * @throws RequestContextException if the request is malformed or an I/O error occurs
+     */
+    public static RequestContext buildContext(BufferedReader reader) throws RequestContextException {
         try {
             String requestLine = reader.readLine();
             if (requestLine == null || requestLine.isBlank()) {
                 return null;
             }
 
-            AbstractMap.SimpleEntry<HttpMethod, String> methodWithPath = extractMethodAndPath(requestLine);
+            SimpleEntry<HttpMethod, String> methodWithPath = extractMethodAndPath(requestLine);
             List<String> headers = new ArrayList<>();
             String line;
             while ((line = reader.readLine()) != null && !line.isEmpty()) {
@@ -53,23 +73,38 @@ public class RequestContext {
             var contentLength = httpHeaders.getFirst("Content-Length");
             if (contentLength != null && !contentLength.isBlank()) {
                 int bodySize = Integer.parseInt(contentLength);
+                int totalRead = 0;
                 char[] bodyBuffer = new char[bodySize];
-                reader.read(bodyBuffer);
-                requestContext.setBody(new String(bodyBuffer));
+                while (totalRead < bodySize) {
+                    int read = reader.read(bodyBuffer, totalRead, bodySize - totalRead);
+                    if (read == - 1) break;
+                    totalRead += read;
+                }
+                
+                requestContext.setBody(new String(bodyBuffer, 0, totalRead));
             }
 
             return requestContext;
 
         } catch (IOException e) {
-            // System.out.println("Exception trying to build request context");
-            log.log(Level.SEVERE, "Exception trying to build request context", e);
+            log.log(Level.WARNING, "Exception trying to build request context", e);
             throw new RequestContextException(e);
         }
     }
 
-    private static AbstractMap.SimpleEntry<HttpMethod, String> extractMethodAndPath(String requestLine) {
+    /**
+     * Extracts HTTP method and path from the request line.
+     *
+     * @param requestLine e.g. "GET /index.html HTTP/1.1"
+     * @return a SimpleEntry containing method and path
+     * @throws RequestContextException if the line does not contain a path
+     */
+    private static SimpleEntry<HttpMethod, String> extractMethodAndPath(String requestLine) throws RequestContextException {
         String[] parts = requestLine.split(" ");
-        return new AbstractMap.SimpleEntry<>(HttpMethod.fromType(parts[0]), parts[1]);
+        if (parts.length < 2) {
+            throw new RequestContextException("Malformed request line: " + requestLine);
+        }
+        return new SimpleEntry<>(HttpMethod.fromType(parts[0]), parts[1]);
     }
 
     public boolean hasPath() {
@@ -77,7 +112,7 @@ public class RequestContext {
     }
 
     public String getPart(int index) {
-        if (pathParts.size() < index) {
+        if (index < 0 || index >= pathParts.size()) {
             return null;
         }
 
@@ -108,7 +143,13 @@ public class RequestContext {
         return path;
     }
 
-    public boolean pathsIsEqualsTo(String actualPath) {
+    /**
+     * Compares the request path to the given string (case‑sensitive).
+     *
+     * @param actualPath the path to compare with
+     * @return true if both paths are equal and non‑blank
+     */
+    public boolean pathEquals(String actualPath) {
         return hasPath() && path.equals(actualPath);
     }
 
