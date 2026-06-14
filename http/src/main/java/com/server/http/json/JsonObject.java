@@ -11,9 +11,6 @@ import java.util.Map.Entry;
  * typed accessors that throw {@link RuntimeException} if the key is missing
  * or the value is of the wrong type.
  * </p>
- *
- * @author Your Name
- * @version 1.0
  */
 public class JsonObject implements JsonValue {
     private final Map<String, JsonValue> object;
@@ -94,5 +91,35 @@ public class JsonObject implements JsonValue {
             throw new RuntimeException("Expected double at key: " + key);
         }
         return jsonValue.asDouble();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("{");
+        boolean first = true;
+        for (Entry<String, JsonValue> entry : object.entrySet()) {
+            if (!first) sb.append(",");
+            first = false;
+            sb.append("\"").append(escapeJson(entry.getKey())).append("\":");
+            appendValue(sb, entry.getValue());
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+
+    private void appendValue(StringBuilder sb, JsonValue value) {
+        if (value.isString()) {
+            sb.append("\"").append(escapeJson(value.asString())).append("\"");
+        } else if (value.isNumber()) {
+            sb.append(value.asNumber());
+        } else if (value.isObject()) {
+            sb.append(value.asObject().toString());
+        } else {
+            sb.append("null");
+        }
+    }
+
+    private String escapeJson(String s) {
+        return s.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }
