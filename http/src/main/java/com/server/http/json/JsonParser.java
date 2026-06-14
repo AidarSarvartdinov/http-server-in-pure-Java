@@ -21,6 +21,7 @@ public class JsonParser {
             skipWhitespace();
             Map.Entry<String, JsonValue> keyValue = parseKeyValue();
             jsonObject.addEntry(keyValue);
+            skipWhitespace();
             if (peek() == ',') {
                 next();
             }
