@@ -1,5 +1,13 @@
 package com.server.http.json;
 
+/**
+ * Represents a JSON value (object, number, string, etc.).
+ * <p>
+ * This is the root interface for all JSON types in the parser.
+ * Provides type checking methods and convenience accessors that throw
+ * {@link UnsupportedOperationException} when the actual type does not match.
+ * </p>
+ */
 public interface JsonValue {
     default boolean isObject() {
         return false;
@@ -30,10 +38,10 @@ public interface JsonValue {
     }
 
     default long asLong() {
-        throw new UnsupportedOperationException("Cannot convert " + getClass().getSimpleName() + " to Long");
+        throw new UnsupportedOperationException("Cannot convert " + getClass().getSimpleName() + " to long");
     }
 
     default double asDouble() {
-        throw new UnsupportedOperationException("Cannot convert " + getClass().getSimpleName() + " Double");
+        throw new UnsupportedOperationException("Cannot convert " + getClass().getSimpleName() + " double");
     }
 }

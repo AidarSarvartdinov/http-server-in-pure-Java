@@ -4,8 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ * Represents a JSON object: an unordered collection of key‑value pairs.
+ * <p>
+ * Keys are strings, values are any {@link JsonValue}. This class provides
+ * typed accessors that throw {@link RuntimeException} if the key is missing
+ * or the value is of the wrong type.
+ * </p>
+ *
+ * @author Your Name
+ * @version 1.0
+ */
 public class JsonObject implements JsonValue {
-    private Map<String, JsonValue> object;
+    private final Map<String, JsonValue> object;
 
     public JsonObject() {
         this.object = new HashMap<>();
@@ -25,6 +36,10 @@ public class JsonObject implements JsonValue {
         object.put(entry.getKey(), entry.getValue());
     }
 
+    public void put(String key, JsonValue value) {
+        object.put(key, value);
+    }
+
     public JsonValue get(String key) {
         return object.get(key);
     }
@@ -32,10 +47,12 @@ public class JsonObject implements JsonValue {
     public String getString(String key) {
         JsonValue jsonValue = get(key);
 
-        if (jsonValue == null ) return null;
+        if (jsonValue == null ) {
+            throw new RuntimeException("Missing key: " + key);
+        }
 
         if (!jsonValue.isString()) {
-            throw new RuntimeException("Excpeted string at key: " + key);
+            throw new RuntimeException("Expected string at key: " + key);
         }
         return jsonValue.asString();
     }
@@ -44,11 +61,11 @@ public class JsonObject implements JsonValue {
         JsonValue jsonValue = get(key);
 
         if (jsonValue == null ) {
-            throw new RuntimeException("Missing or null key: " + key);
+            throw new RuntimeException("Missing key: " + key);
         }
         
         if (!jsonValue.isNumber()) {
-            throw new RuntimeException("Excpeted integer at key: " + key);
+            throw new RuntimeException("Expected integer at key: " + key);
         }
         return jsonValue.asInt();
     }
@@ -57,11 +74,11 @@ public class JsonObject implements JsonValue {
         JsonValue jsonValue = get(key);
 
         if (jsonValue == null ) {
-            throw new RuntimeException("Missing or null key: " + key);
+            throw new RuntimeException("Missing key: " + key);
         }
         
         if (!jsonValue.isNumber()) {
-            throw new RuntimeException("Excpeted long at key: " + key);
+            throw new RuntimeException("Expected long at key: " + key);
         }
         return jsonValue.asLong();
     }
@@ -70,11 +87,11 @@ public class JsonObject implements JsonValue {
         JsonValue jsonValue = get(key);
 
         if (jsonValue == null ) {
-            throw new RuntimeException("Missing or null key: " + key);
+            throw new RuntimeException("Missing key: " + key);
         }
         
         if (!jsonValue.isNumber()) {
-            throw new RuntimeException("Excpeted double at key: " + key);
+            throw new RuntimeException("Expected double at key: " + key);
         }
         return jsonValue.asDouble();
     }

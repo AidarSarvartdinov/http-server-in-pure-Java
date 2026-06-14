@@ -1,7 +1,14 @@
 package com.server.http.json;
 
+/**
+ * A JSON number value.
+ * <p>
+ * Holds a {@link Number}.
+ * Provides typed accessors for primitive numeric types.
+ * </p>
+ */
 public class JsonNumber implements JsonValue {
-    private Number number;
+    private final Number number;
 
     public JsonNumber(Number number) {
         this.number = number;
