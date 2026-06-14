@@ -30,7 +30,7 @@ public class HandlerMethod {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T invoke(Object... args) {
+    public <T> T invoke(Object... args) throws HandlerException {
         try {
             return (T) handler.invoke(handlerObject, args);
         } catch (IllegalAccessException | InvocationTargetException e) {

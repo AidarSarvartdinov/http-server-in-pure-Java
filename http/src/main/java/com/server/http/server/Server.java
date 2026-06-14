@@ -10,6 +10,15 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * A simple HTTP server that listens on a specified port and handles incoming
+ * requests using virtual threads.
+ * <p>
+ * Each client connection is handed off to a {@link RequestHandler} and executed
+ * in a separate virtual thread. The server runs until the JVM terminates;
+ * no graceful shutdown is currently implemented.
+ * </p>
+ */
 public class Server {
     private final int port;
 
@@ -29,11 +38,9 @@ public class Server {
             log.log(Level.INFO, "Server started on port {0}", String.valueOf(port));
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                // System.out.println("Accepted new connection");
                 executorService.execute(new RequestHandler(clientSocket));
             }
         } catch (IOException e) {
-            // System.out.println("IOException: " + e.getMessage());
             log.log(Level.SEVERE, "IOException", e);
         }
     }

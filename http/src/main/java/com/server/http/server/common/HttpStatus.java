@@ -3,7 +3,9 @@ package com.server.http.server.common;
 public enum HttpStatus {
     OK(200, Series.SUCCESSFUL, "OK"),
     CREATED(201, Series.SUCCESSFUL, "Created"),
-    NOT_FOUND(404, Series.CLIENT_ERROR, "Not Found");
+    BAD_REQUEST(400, Series.CLIENT_ERROR, "Bad Request"),
+    NOT_FOUND(404, Series.CLIENT_ERROR, "Not Found"),
+    INTERNAL_SERVER_ERROR(500, Series.SERVER_ERROR, "Internal Server Error");
 
     public String getReasonPhrase() {
         return reasonPhrase;

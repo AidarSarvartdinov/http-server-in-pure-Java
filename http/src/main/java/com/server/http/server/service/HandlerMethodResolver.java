@@ -15,7 +15,6 @@ public class HandlerMethodResolver {
                         PathPattern.path(it.getPath()).match(context.getPath()))
                 .findFirst()
                 .orElseGet(() -> {
-                    // System.out.println("Handler by context not found: " + context);
                     log.warning("Handler by context not found: " + context);
                     return null;
                 });
