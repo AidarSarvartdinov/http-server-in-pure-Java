@@ -8,6 +8,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Represents an HTTP response context containing status, headers, and body.
+ */
 public class ResponseContext {
     private HttpStatus status;
 
@@ -39,15 +42,25 @@ public class ResponseContext {
         return context;
     }
 
-    public byte[] getResponseAsBytes() {
+    /**
+     * Assembles the complete HTTP response as a byte array.
+     * <p>
+     * The response conforms to HTTP/1.1: status line, headers (if any), an empty line,
+     * and the body.
+     * </p>
+     *
+     * @return the full HTTP response bytes
+     * @throws ResponseContextException if an I/O error occurs
+     */
+    public byte[] getResponseAsBytes() throws ResponseContextException {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             outputStream.write(("HTTP/1.1 " + status.getCode() + " " + status.getReasonPhrase() + "\r\n").getBytes());
             
             if (headers != null) {
                 outputStream.write(headers.toString().getBytes());
+            } else {
+                outputStream.write("\r\n".getBytes());
             }
-
-            // outputStream.write("\r\n".getBytes());
 
             if (responseBody != null) {
                 outputStream.write(responseBody);
